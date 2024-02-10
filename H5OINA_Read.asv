@@ -8,7 +8,7 @@ function [ebsd_data,header_data,h5_contents]=H5OINA_Read(file1_full)
 
 %read the contents of the file
 [h5_contents] = get_h5_list(file1_full);
-
+    
 %go through each dataset for the structure and read the h5 data
 num_datasets=numel(h5_contents.datasets);
 
@@ -23,7 +23,7 @@ for n=1:num_datasets
 
     data_loc=strfind(data_setname,data_str);
     if ~isempty(data_loc)
-
+       
         %read the pre data number
         data_str_pre=[];
         data_str_pre=data_setname(1:data_loc-1);
@@ -33,7 +33,7 @@ for n=1:num_datasets
         %convert any spaces to underscore
         data_str_space=strfind(data_str_end,' ');
         data_str_end(data_str_space)='_';
-
+  
 
         ebsd_data.(data_str_pre).(data_str_end)=h5read(file1_full,['/' data_setname]);
     end
@@ -46,7 +46,7 @@ for n=1:num_datasets
 
     data_loc=strfind(data_setname,data_str);
     if ~isempty(data_loc)
-
+       
         %read the pre data number
         data_str_pre=[];
         data_str_pre=data_setname(1:data_loc-1);
@@ -61,19 +61,19 @@ for n=1:num_datasets
             data_str_space=strfind(data_str_end,' ');
             data_str_end(data_str_space)='_';
 
-            %write the header data
+
             header_data.(data_str_pre).(data_str_end)=h5read(file1_full,['/' data_setname]);
         end
     end
 
-    %read phase data
+    %see if it is 'EBSD/Header'
     data_str='/Header/Phases/';
     data_srt_len=numel(data_str);
     data_setname=h5_contents.datasets{n};
 
     data_loc=strfind(data_setname,data_str);
     if ~isempty(data_loc)
-
+       
         %read the pre data number
         data_str_pre=[];
         data_str_pre=data_setname(1:data_loc-1);
@@ -85,12 +85,24 @@ for n=1:num_datasets
 
         phasenum=str2double(data_str_end(1:ploc-1));
         fieldname=data_str_end(ploc+1:end);
-        %convert any spaces to underscore
-        fieldname(strfind(fieldname,' '))='_';
         
-        %write the phase data for this slice
-        header_data.(data_str_pre).phase{phasenum}.(fieldname)=h5read(file1_full,['/' data_setname]);
+    
+        phase_loc2=
+        data_str_phasenum=['p' ]
+        %check this does not have any '/' subsets
+        endian=strfind(data_str_end,'/');
+        if isempty(endian)
+            %convert any spaces to underscore
+            data_str_space=strfind(data_str_end,' ');
+            data_str_end(data_str_space)='_';
+
+
+            header_data.phases.(data_str_pre).(data_str_end)=h5read(file1_full,['/' data_setname]);
+        end
     end
+
+
+
 end
 
 end

@@ -30,21 +30,21 @@ end
 %contained per layer/slice in the file
 [ebsd_data,header_data,h5oina_contents]=H5OINA_Read(file1_full);
 
-%read and convert the phase data
 CS{1}='notIndexed';
 num_phases=numel(header_data.(['s' file_dset]).phase);
+
 
 for n=1:num_phases
     phaseN=1+n;
     Space_Group=header_data.(['s' file_dset]).phase{1}.Space_Group;
-    Lattice_Dimensions=double(header_data.(['s' file_dset]).phase{1}.Lattice_Dimensions);
+    Lattice_Dimensions=header_data.(['s' file_dset]).phase{1}.Lattice_Dimensions;
     Mineral=char(header_data.(['s' file_dset]).phase{1}.Phase_Name);
-    Lattice_Angles=double(header_data.(['s' file_dset]).phase{1}.Lattice_Angles);
+
 
     CS{phaseN} = crystalSymmetry('SpaceId',Space_Group, ...
-        Lattice_Dimensions,...
-        Lattice_Angles,...
-        'Mineral',Mineral);
+        double(EBSDphases.(pN).Lattice_Dimensions'),...
+        double(header_data.(['s' file_dset]).phase{1}.Lattice_Angles),...
+        'Mineral',Mineral));
 end
 
 
