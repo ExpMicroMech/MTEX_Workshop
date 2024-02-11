@@ -1,0 +1,4 @@
+Scripts created by Ben Britton
+
+Example data:
+Mg data - sample = Shuheng Li, h5oina data collected with Ruth Birch

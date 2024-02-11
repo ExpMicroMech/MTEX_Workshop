@@ -136,24 +136,13 @@ odf = calcDensity(ebsd(mineral_name).orientations);
 figure;
 % plot the pole figure representation of the ODF
 plotPDF(odf,[Miller(0,0,1,ebsd(mineral_name).CS) Miller(0,1,0,ebsd(mineral_name).CS)]);
-
 mtexColorbar('location','southoutside')
-mtexColorMap blue2red
-
-%add contours
-levels=[-7:7];
-hold on;
-plotPDF(odf,[Miller(0,0,1,ebsd(mineral_name).CS) Miller(0,1,0,ebsd(mineral_name).CS)],'contour',levels,'linecolor','k');
-mtexColorbar('location','southoutside')
-
 
 %you can also plot this ODF in the IPF
 figure;
-% plot the inverse pole figure representation of the ODF
+% plot the pole figure representation of the ODF
 plotIPDF(odf,[xvector yvector zvector])
 mtexColorbar('location','southoutside')
-mtexColorMap blue2red
-
 
 %% Plot the uncorrelated misorientation distribution
 %see https://mtex-toolbox.github.io/MisorientationDistributionFunction.html
@@ -279,7 +268,6 @@ plot(grains_indexed_int.boundary,'linewidth',0.5,'lineColor','g')
 hold off
 
 %take a mouse input
-disp('Click a grain to select it')
 [x_g,y_g]=ginput(1);
 
 %find the nearest point in the data to this point
@@ -312,11 +300,10 @@ plot(ebsd,ebsd.prop.Band_Contrast)
 
 %here we will use a mouse click pair to cut out the box - pick two opposite
 %diagonals
-disp('Click two diagonal points to select a box to subset the data')
-[x_i,y_i]=ginput(2);
+% [x_i,y_i]=ginput(2);
 
-% x_i=[-918;-205];
-% y_i=[572;1010];
+x_i=[-918;-205];
+y_i=[572;1010];
 
 hold on;
 scatter(x_i,y_i);
@@ -412,13 +399,12 @@ title('Crystal Orientation - Z')
 
 
 % take a mouse input
-disp('Select an individual grain as your seed grain orientation');
- [x,y]=ginput(1);
+ % [x,y]=ginput(1);
 
 % % hard code the mouse input to run this - swap the commenting around
 % % if you want a ginput
 % % hard coded position, in um
-% x=1379; y=1331;
+x=1379; y=1331;
 
 %add the point to the figure as a black spot
 hold on;
@@ -475,8 +461,7 @@ title(['Data far from selected grain (>' int2str(orientation_threshold) '^o)'])
 
 %%
 
-grain_IDs_close=unique(test_orientations_in.grainId);
-grains_close=grains(grain_IDs_close);
+grains_close=grains(test_orientations_in);
 grains_close=grains_close(grains_close.grainSize>3);
 grains_close=grains_close(~grains_close.isBoundary);
 
@@ -485,16 +470,16 @@ plot(test_orientations_in, test_orientations_in.prop.Band_Contrast);
 % title(['Data far from selected grain (>' int2str(orientation_threshold) '^o)'])
 
 hold on
-plot(grains_close.boundary,'linewidth',1,'lineColor','r')
+plot(grains_close.boundary,'linewidth',2,'lineColor','r')
 
 % plot the unit cells
-%plot the crystal shape for this point
-scaling = 125; % scale the crystal shape to have a nice size
-%here we use a hexagon, but you could use a cube for cubic
-%crystalShape.cube
-cS = crystalShape.hex(grains_close(mineral_name).CS);
-grain_centroids=grains_close.centroid;
-plot(grain_centroids(:,1),grain_centroids(:,2),50, grains_close.meanOrientation * cS * scaling,'FaceAlpha',0.2); %make the hexagons also transparent so you can see the grains behind
+% %plot the crystal shape for this point
+% scaling = 25; % scale the crystal shape to have a nice size
+% %here we use a hexagon, but you could use a cube for cubic
+% %crystalShape.cube
+% cS = crystalShape.hex(grains_close(mineral_name).CS);
+% grain_centroids=grains_close.centroid;
+% plot(grain_centroids(:,1),grain_centroids(:,2),50, grains_close.meanOrientation * cS * scaling)
 
 %% copy this m file over, for archival purposes
 
