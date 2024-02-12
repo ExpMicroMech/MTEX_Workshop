@@ -1,4 +1,7 @@
-results/
+# Results Folder #
+/results/
+/results/*
+
 
 # Logs and databases #
 ######################
