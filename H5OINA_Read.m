@@ -23,19 +23,20 @@ for n=1:num_datasets
 
     data_loc=strfind(data_setname,data_str);
     if ~isempty(data_loc)
+        if ~isempty(stcrmpi(data_setname,'Patterns')) %avoid loading processed or unprocessed patterns
+            %read the pre data number
+            data_str_pre=[];
+            data_str_pre=data_setname(1:data_loc-1);
+            data_str_pre=['s' data_str_pre]; %add a letter to start, because matlab does not like numerical variable names
 
-        %read the pre data number
-        data_str_pre=[];
-        data_str_pre=data_setname(1:data_loc-1);
-        data_str_pre=['s' data_str_pre]; %add a letter to start, because matlab does not like numerical variable names
-
-        data_str_end=data_setname(data_loc+data_srt_len:end);
-        %convert any spaces to underscore
-        data_str_space=strfind(data_str_end,' ');
-        data_str_end(data_str_space)='_';
+            data_str_end=data_setname(data_loc+data_srt_len:end);
+            %convert any spaces to underscore
+            data_str_space=strfind(data_str_end,' ');
+            data_str_end(data_str_space)='_';
 
 
-        ebsd_data.(data_str_pre).(data_str_end)=h5read(file1_full,['/' data_setname]);
+            ebsd_data.(data_str_pre).(data_str_end)=h5read(file1_full,['/' data_setname]);
+        end
     end
 
 
