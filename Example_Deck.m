@@ -7,6 +7,10 @@ close all;
 file1_folder='C:\Users\benja\OneDrive\Documents\GitHub\MTEX_Workshop\Data'; %location where the data is stored
 file1_name='Mg_Pecs1 Specimen 1 Site 1 Map Data 1'; %should be a h5oina file, do not add in the .h5oina file extension
 
+% file1_folder='/MATLAB Drive/MTEX_Workshop/Data/';
+% file1_name='Mg_Pecs1 Specimen 1 Site 1 Map Data 1'; %should be a h5oina file, do not add in the .h5oina file extension
+
+
 file_dset='1'; %data set number of interest in the h5 file
 
 mb_length = 500; %micro bar length for plots - if you want to override, you can comment this out/clear this variable and the override will not happen
@@ -17,6 +21,7 @@ mb_length = 500; %micro bar length for plots - if you want to override, you can 
 %if MTEX loaded this doesn't matter
 %if MTEX is not loaded, then this will be used to start MTEX up
 mtex_location='C:\Users\benja\OneDrive\Documents\MATLAB\mtex-5.10.2';
+% mtex_location='/MATLAB Drive/mtex-5.10.2';
 
 %start mtex if needed
 try EBSD;
