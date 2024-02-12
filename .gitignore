@@ -1,7 +1,4 @@
-#/results/*
-/results/*
-#\results\*
-\results\*
+results/
 
 # Logs and databases #
 ######################
