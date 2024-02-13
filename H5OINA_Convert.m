@@ -1,4 +1,4 @@
-function [ebsdtemp] = H5OINA_Convert(ebsd_data,header_data,file_dset)
+function [ebsdtemp] = H5OINA_Convert(ebsd_data,header_data,file_dset,phase_names,phase_colors)
 %H5OINA_CONVERT Convert the output from the HFOINA_Read function into a
 %MTEX EBSD container
 %
@@ -14,15 +14,26 @@ num_phases=numel(header_data.(slice_name).phase);
 
 for n=1:num_phases
     phaseN=1+n;
-    Space_Group=header_data.(['s' file_dset]).phase{1}.Space_Group;
-    Lattice_Dimensions=double(header_data.(['s' file_dset]).phase{1}.Lattice_Dimensions);
-    Mineral=char(header_data.(['s' file_dset]).phase{1}.Phase_Name);
+    Space_Group=header_data.(['s' file_dset]).phase{n}.Space_Group;
+    Lattice_Dimensions=double(header_data.(['s' file_dset]).phase{n}.Lattice_Dimensions);
+    if nargin >= 4
+        Mineral=phase_names{n};
+    else
+        Mineral=char(header_data.(['s' file_dset]).phase{1}.Phase_Name);
+    end
     Lattice_Angles=double(header_data.(['s' file_dset]).phase{1}.Lattice_Angles);
-
-    CS{phaseN} = crystalSymmetry('SpaceId',Space_Group, ...
-        Lattice_Dimensions,...
-        Lattice_Angles,...
-        'Mineral',Mineral);
+    
+    if nargin < 5
+        CS{phaseN} = crystalSymmetry('SpaceId',Space_Group, ...
+            Lattice_Dimensions,...
+            Lattice_Angles,...
+            'Mineral',Mineral);
+    else
+        CS{phaseN} = crystalSymmetry('SpaceId',Space_Group, ...
+            Lattice_Dimensions,...
+            Lattice_Angles,...
+            'Mineral',Mineral,'Color',phase_colors{n});
+    end
 end
 
 rc = rotation.byEuler(double(header_data.(slice_name).Specimen_Orientation_Euler(:)')*degree); % what definition? Bunge?

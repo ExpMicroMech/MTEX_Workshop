@@ -85,7 +85,8 @@ if exist('mb_length','var'); mp = MTEX_mb_fix(mb_length); end %change the micron
 
 %% IPF-x, y and z
 % compute the colors
-ipfKey = ipfHSVKey(ebsd(mineral_name));
+% ipfKey = ipfHSVKey(ebsd(mineral_name));
+ipfKey = ipfTSLKey(ebsd(mineral_name)); %use the TSL
 
 %plot the key
 f1=figure;
@@ -180,6 +181,8 @@ legend('data MDF','uniform ODF')
 %see https://mtex-toolbox.github.io/GrainReconstruction.html
 
 [grains,ebsd.grainId] = calcGrains(ebsd,'angle',10*degree); 
+% [grains,ebsd.grainId] = calcGrains(ebsd,'angle',10*degree,'boundary','tight');
+
 %care with this threshold value - you can look at the angle distribution for some guidance
 
 %Now plot the grian boundary map on the band contrast map
@@ -252,7 +255,7 @@ xlims=xlim; xlim([0 xlims(2)]);
 
 min_grain_radius=10;
 grains_reduced=grains_indexed_int(grains_indexed_int.equivalentRadius>min_grain_radius);
-
+grains_excluded=grains_indexed_int(grains_indexed_int.equivalentRadius<=min_grain_radius);
 figure;
 plot(ebsd,ebsd.prop.Band_Contrast); colormap('gray');
 hold on;
@@ -262,6 +265,8 @@ if exist('mb_length','var'); mp = MTEX_mb_fix(mb_length); end %change the micron
 
 hold on
 plot(grains_reduced.boundary,'linewidth',0.5,'lineColor','g')
+plot(grains_excluded.boundary,'linewidth',0.5,'lineColor','r')
+
 hold off
 
 %% Demonstrate that we can extract a point from this map
@@ -477,7 +482,7 @@ nextAxis;
 plot(test_orientations_out, ipfKey.orientation2color(test_orientations_out.orientations));
 title(['Data far from selected grain (>' int2str(orientation_threshold) '^o)'])
 
-%%
+%% plot some unit cells for this
 
 grain_IDs_close=unique(test_orientations_in.grainId);
 grains_close=grains(grain_IDs_close);
