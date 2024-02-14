@@ -23,7 +23,7 @@ for n=1:num_datasets
 
     data_loc=strfind(data_setname,data_str);
     if ~isempty(data_loc)
-        if ~isempty(strcmpi(data_setname,'Patterns')) %avoid loading processed or unprocessed patterns
+        if isempty(strfind(data_setname,'Patterns')) %avoid loading processed or unprocessed patterns
             %read the pre data number
             data_str_pre=[];
             data_str_pre=data_setname(1:data_loc-1);
