@@ -14,15 +14,15 @@ num_phases=numel(header_data.(slice_name).phase);
 
 for n=1:num_phases
     phaseN=1+n;
-    Space_Group=header_data.(['s' file_dset]).phase{n}.Space_Group;
+    Space_Group=double(header_data.(['s' file_dset]).phase{n}.Space_Group);
     Lattice_Dimensions=double(header_data.(['s' file_dset]).phase{n}.Lattice_Dimensions);
     if nargin >= 4
         Mineral=phase_names{n};
     else
         Mineral=char(header_data.(['s' file_dset]).phase{1}.Phase_Name);
     end
-    Lattice_Angles=double(header_data.(['s' file_dset]).phase{1}.Lattice_Angles);
-    
+    Lattice_Angles=double(header_data.(['s' file_dset]).phase{n}.Lattice_Angles);
+    % round(
     if nargin < 5
         CS{phaseN} = crystalSymmetry('SpaceId',Space_Group, ...
             Lattice_Dimensions,...

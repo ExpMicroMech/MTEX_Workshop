@@ -9,6 +9,18 @@ close all;
 % run the whoole script or parts of it in order to import your data. There
 % is no problem in making any changes to this script.
 
+%location of MTEX 5.10.2
+%if MTEX loaded this doesn't matter
+%if MTEX is not loaded, then this will be used to start MTEX up
+mtex_location='C:\Users\benja\OneDrive\Documents\MATLAB\mtex-5.10.2';
+% mtex_location='/MATLAB Drive/mtex-5.10.2';
+
+%start mtex if needed
+try EBSD;
+catch
+    run(fullfile(mtex_location,"startup.m"));
+end
+
 %% Specify Crystal and Specimen Symmetries
 
 % crystal symmetry
@@ -48,7 +60,8 @@ plot(ebsd,ebsd.prop.iq); colormap('gray');
 
 %% IPF-x, y and z
 % compute the colors
-ipfKey = ipfHSVKey(ebsd(mineral_name));
+% ipfKey = ipfHSVKey(ebsd(mineral_name));
+ipfKey = ipfTSLKey(ebsd(mineral_name));
 
 %plot the key
 f1=figure;

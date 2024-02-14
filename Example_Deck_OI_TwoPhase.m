@@ -82,8 +82,8 @@ if exist('mb_length','var'); mp = MTEX_mb_fix(mb_length); end %change the micron
 
 %% IPF-x, y and z
 % compute the colors
-ipfKey1 = ipfHSVKey(ebsd(phase_names{1}));
-ipfKey2 = ipfHSVKey(ebsd(phase_names{2}));
+ipfKey1 = ipfTSLKey(ebsd(phase_names{1}));
+ipfKey2 = ipfTSLKey(ebsd(phase_names{2}).CS);
 
 %plot the key
 f1=figure;
@@ -170,7 +170,91 @@ plotPDF(odf2,[Miller(0,1,1,ebsd(phase_names{2}).CS) Miller(1,1,1,ebsd(phase_name
 mtexColorbar('location','southoutside')
 mtexColorMap blue2red
 
-%% ideas
+%% Plot the KAM
+%see https://mtex-toolbox.github.io/EBSDKAM.html for more detail
+% it is important to read this carefully, the KAM can be calculated in lots
+% of different ways
+ebsd=gridify(ebsd); %gridify the data
+[grains,ebsd.grainId] = calcGrains(ebsd,'angle',10*degree); 
+%smooth the grains to be prettier
+grains_pretty = smooth(grains,5);
+
+kam_alpha = ebsd(phase_names{1}).KAM / degree;
+kam_beta = ebsd(phase_names{2}).KAM / degree;
+
+%plot the spatial map
+f1=figure;
+s1=subplot(1,2,1); %create a subplot axis
+plot(ebsd(phase_names{1}),kam_alpha,'parent',s1);
+hold on;
+plot(ebsd(phase_names{2}),kam_beta,'parent',s1);
+clim([0,15])
+mtexColorbar
+mtexColorMap LaboTeX
+plot(grains_pretty.boundary,'lineWidth',0.5,'parent',s1)
+hold off
+%note that using subplot removes the micronbar!!!
+
+
+KAM_bins=linspace(0,15,31); %use half degree bins - 31 between 0 and 15
+s2=subplot(1,2,2);
+histogram(kam_alpha,KAM_bins,'Parent',s2);
+hold on
+histogram(kam_beta,KAM_bins,'Parent',s2);
+
+legend({'KAM $$\alpha$$','KAM $$\beta$$'},'interpreter','latex')
+ylabel('Frequency')
+xlabel('KAM $$^{\circ}$$','interpreter','latex')
+
+% as we can see that this graph has a different color range - rescale
+% figure 1 color axis
+s1.CLim=[0 5];
+
+%% Now we can play with KAM this metric has some nuance
+% see https://mtex-toolbox.github.io/EBSDKAM.html for a full explore
+
+kam_alpha = ebsd(phase_names{1}).KAM / degree;
+kam_alpha_3 = ebsd(phase_names{1}).KAM('threshold',3*degree) / degree;
+kam_alpha_3_5neigh=ebsd.KAM('threshold',2.5*degree,'order',5) / degree;
+
+KAM_bins=linspace(0,15,61); %use 0.25 degree bins - 61 between 0 and 15
+
+figure;
+histogram(kam_alpha,KAM_bins);
+hold on
+histogram(kam_alpha_3,KAM_bins);
+histogram(kam_alpha_3_5neigh,KAM_bins);
+
+legend({'KAM $$\alpha$$','KAM $$\alpha$$ 2.5 limit','KAM $$\alpha$$ 2.5 limit 5 neighbours'},'interpreter','latex')
+
+%% We can also test if this data fits a distribution
+
+%use prob plot to test a few potential distribution types
+%
+% look at prob plot for what you can try
+
+figure;
+subplot(2,2,1);
+probplot('lognormal',kam_alpha); 
+
+subplot(2,2,2);
+probplot('normal',kam_alpha); 
+
+subplot(2,2,3);
+probplot('rayleigh',kam_alpha); 
+
+subplot(2,2,4);
+probplot('half normal',kam_alpha); 
+
+% if the measured data (blue) fits on the model data (dashed line), then
+% this distribution could be a reasonable approximation for the data type
+%
+% there are quite a few theories about what this distribution *should* be
+%
+% see work by Wolfgang Pantleon, as well as work by Jiang, Britton &
+% Wilkinson
+
+%% Further ideas
 
 %you could extract one or more grains from the alpha phase and look at the
 %orientations of the nearby beta
