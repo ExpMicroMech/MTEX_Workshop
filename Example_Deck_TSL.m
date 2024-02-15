@@ -227,3 +227,29 @@ grain_centroids=grains.centroid;
 plot(grain_centroids(:,1),grain_centroids(:,2),-max(grains.area), grains.meanOrientation * cS .*sqrt(grains.area./4),'FaceAlpha',0.9); %make the hexagons also transparent so you can see the grains behind
 xlim([min(ebsd.prop.x) max(ebsd.prop.x)]);
 ylim([min(ebsd.prop.y) max(ebsd.prop.y)]);
+
+%% Measure the misorientation between two points
+
+%first lets use the GUI tools to grab a few (well two) points
+figure;
+plot(ebsd_filtered_ok_filled(mineral_name),colors_Z2);
+%click two points you want to extract
+disp('click two points you want to measure the misorientations between')
+[x_g,y_g]=ginput(2);
+
+%find the pattern number for each of these points
+pattern_number=zeros(size(x_g));
+%find the nearest point in the data to this point
+for n=1:numel(x_g)
+    p_map=(ebsd.prop.x-x_g(n)).^2+(ebsd.prop.y-y_g(n)).^2;
+    [mv,pattern_number(n)]=min(p_map);
+end
+
+ebsd_points=ebsd(pattern_number);
+
+hold on;
+scatter(ebsd_points.prop.x,ebsd_points.prop.y);
+
+%now we can calculate the misorientation angle between these two points
+mis_angle_degree=angle(ebsd_points(1).orientations,ebsd_points(2).orientations)./degree
+mis_axis=axis(ebsd_points(1).orientations,ebsd_points(2).orientations)
