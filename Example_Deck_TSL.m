@@ -253,3 +253,27 @@ scatter(ebsd_points.prop.x,ebsd_points.prop.y);
 %now we can calculate the misorientation angle between these two points
 mis_angle_degree=angle(ebsd_points(1).orientations,ebsd_points(2).orientations)./degree
 mis_axis=axis(ebsd_points(1).orientations,ebsd_points(2).orientations)
+
+% We can also use this line segment to calculate a profile
+% https://mtex-toolbox.github.io/EBSDProfile.html
+hold on;
+line(x_g,y_g,'linewidth',2,'Color','k')
+line(x_g,y_g,'linewidth',1,'Color','w')
+lineSeg=[x_g,y_g];
+
+ebsd_line = spatialProfile(ebsd,lineSeg);
+
+figure;
+% misorientation angle to the first orientation on the line
+plot(ebsd_line.y,...
+  angle(ebsd_line(1).orientations,ebsd_line.orientations)/degree)
+
+% misorientation gradient
+hold all
+plot(0.5*(ebsd_line.y(1:end-1)+ebsd_line.y(2:end)),...
+  angle(ebsd_line(1:end-1).orientations,ebsd_line(2:end).orientations)/degree)
+hold off
+
+xlabel('y'); ylabel('misorientation angle in degree')
+
+legend('to reference orientation','orientation gradient')
