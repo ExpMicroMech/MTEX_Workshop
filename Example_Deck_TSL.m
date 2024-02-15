@@ -248,7 +248,9 @@ end
 ebsd_points=ebsd(pattern_number);
 
 hold on;
-scatter(ebsd_points.prop.x,ebsd_points.prop.y);
+scatter(ebsd_points.prop.x,ebsd_points.prop.y,'k');
+scatter(ebsd_points(1).prop.x,ebsd_points(1).prop.y,'filled','w'); %make the first one white
+scatter(ebsd_points(end).prop.x,ebsd_points(end).prop.y,'filled','k'); %make the last one black
 
 %now we can calculate the misorientation angle between these two points
 mis_angle_degree=angle(ebsd_points(1).orientations,ebsd_points(2).orientations)./degree
