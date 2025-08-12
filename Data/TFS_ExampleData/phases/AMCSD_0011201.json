@@ -1,0 +1,52 @@
+{
+  "name": "Zirconium",
+  "chemical_formula": "Zr",
+  "database": "AMCSD",
+  "database_code": "0011201",
+  "reference": {
+    "journal": "Crystal Structures",
+    "volume": 1,
+    "first_page": 7,
+    "last_page": 83,
+    "year": 1963
+  },
+  "space_group_HM": "P63/mmc",
+  "space_group_number": 194,
+  "laue_group": "Hexagonal High",
+  "laue_group_symbol": "6/mmm",
+  "a": 3.232,
+  "b": 3.232,
+  "c": 5.147,
+  "alpha": 90.0,
+  "beta": 90.0,
+  "gamma": 120.0,
+  "cell_volume": 46.562,
+  "family_number": 5541,
+  "is_best_in_family": true,
+  "temperature": null,
+  "pressure": null,
+  "comments": "Second edition. Interscience Publishers, New York, New York||Hexagonal closest packed, hcp, structure",
+  "composition": [
+    {
+      "element": "Zr",
+      "percentage": 100.0
+    }
+  ],
+  "composition_atoms": "Zr",
+  "atoms": [
+    {
+      "element": "Zr",
+      "x": 0.33333,
+      "y": 0.66667,
+      "z": 0.25,
+      "occupancy": 1.0
+    },
+    {
+      "element": "Zr",
+      "x": 0.666669965,
+      "y": 0.33334,
+      "z": 0.75,
+      "occupancy": 1.0
+    }
+  ]
+}
