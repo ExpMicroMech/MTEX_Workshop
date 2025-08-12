@@ -12,7 +12,7 @@ close all;
 %location of MTEX 5.10.2
 %if MTEX loaded this doesn't matter
 %if MTEX is not loaded, then this will be used to start MTEX up
-mtex_location='C:\Users\benja\OneDrive\Documents\MATLAB\mtex-5.10.2';
+mtex_location='C:\Users\ruthb\OneDrive\Documents\MTEX\mtex-5.11.2';
 % mtex_location='/MATLAB Drive/mtex-5.10.2';
 
 %start mtex if needed
@@ -38,7 +38,7 @@ setMTEXpref('zAxisDirection','inToPlane');
 %% Specify File Names
 
 % path to files
-pname = 'C:\Users\benja\OneDrive\Documents\GitHub\MTEX_Workshop\Data';
+pname = 'C:\Users\ruthb\DocumentsOnLaptop\GitHub\MTEX_Workshop\Data';
 
 % which files to be imported
 fname = [pname '\scan1.ang'];
