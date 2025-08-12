@@ -1,0 +1,115 @@
+{
+  "Info": {
+    "UIVersion": "1.0.0.2127 Release64",
+    "EbsdServiceVersion": "5.9.12",
+    "ProcessingLibVersion": "0.4.4",
+    "HALVersion": "0.15.5",
+    "Width": 200,
+    "Height": 133,
+    "TotalNumberOfPoints": 26600,
+    "OffsetOfMapCenterFromFieldOfViewCenterInMeters": "0,0",
+    "WorkingDistance": 0.011881190701613692,
+    "HorizontalFieldWidth": 0.00015,
+    "LandingEnergy": 20000.0,
+    "StageBias": 110.0,
+    "ChamberPressure": 0.00042298817022155816,
+    "BeamCurrent": 1.28E-08,
+    "MapStepSize": 7.5E-07,
+    "ExposureTime": 0.010299998845160007,
+    "Threshold": 11000.0,
+    "SEMType": "Apreo ChemiSEM S HiVac",
+    "SemImageWidth": 1536,
+    "SemImageHeight": 1024,
+    "Detector": "???????????????????????????????? rev. 2.11",
+    "DetectorType": "TruePix",
+    "DetectorSerialNumberBackend": "26D22A19",
+    "DetectorSerialNumberFrontend": "14",
+    "DetectorSerialNumberChips": [
+      "L07-W0323"
+    ],
+    "DetectorBias": 50.812305450439453,
+    "DetectorPosition": 0.14657999575138092,
+    "StagePosition": {
+      "X": 0.0020666412815555607,
+      "Y": 0.033806225870413154,
+      "Z": 0.011900208639947769,
+      "Rotation": -2.8803520218739661E-08,
+      "Tilt": 0.43631158971596834
+    },
+    "SpecimenTilt": 1.2217097531134162,
+    "IsTiltCorrectionEnabled": true,
+    "IsDynamicFocusEnabled": true,
+    "MaximumFrameTime": 0.0037499999161809683,
+    "IsMaximumFrameTimeCalibrationAutomatic": false,
+    "IsFlatFieldCalibrationValid": true,
+    "PhaseNames": null,
+    "TotalTime": 272.3889003,
+    "FrameRate": 97.186607360839844,
+    "HitRate": 0.85556390977443608,
+    "Geometry": {
+      "PatternWidth": 256,
+      "PatternHeight": 256,
+      "singlechip": true
+    },
+    "PatternCenterCalibrationModel": {
+      "Version": 2,
+      "ModelData": {
+        "A": [
+          [
+            -0.07106083572808608,
+            -0.01325408060380795,
+            0.0016971986906542114,
+            0.00087012135329445073,
+            0.40899378214726312
+          ],
+          [
+            0.0061640432695907786,
+            0.0014100545615320925,
+            0.071834893955641022,
+            -0.012640638751435063,
+            3.2958717478541075
+          ],
+          [
+            0.000103314114248265,
+            -0.0711170378777517,
+            0.0004322332288828612,
+            -0.069345867360645741,
+            10.677973700111579
+          ]
+        ],
+        "DetectorOrientation": {
+          "e1": -1.5580354014078921,
+          "e2": 90.502624102028932,
+          "e3": 0.18016879536563823
+        }
+      }
+    },
+    "PatternCenterInterpolationParameters": {
+      "B": [
+        [
+          -0.07106083572808608,
+          -0.00612825370624008,
+          0.51637142511415779
+        ],
+        [
+          0.0061640432695907786,
+          -0.067019916078779967,
+          0.58952289925684731
+        ],
+        [
+          0.000103314114248265,
+          -0.024731007693358339,
+          0.50812131159237062
+        ]
+      ],
+      "DetectorOrientation": {
+        "e1": -1.5580354014078921,
+        "e2": 90.502624102028932,
+        "e3": 0.18016879536563823
+      },
+      "Description": "derived from PC_CalibrationModel2 for wd = 11.881 mm, det_z = 146.580 mm, tilt = 70.00 deg"
+    }
+  },
+  "SubMaps": [],
+  "SelectedSubMapIndex": -1
+}
