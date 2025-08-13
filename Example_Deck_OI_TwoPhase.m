@@ -2,31 +2,26 @@ clear;
 home;
 close all;
 
-%% The h5 file location
+%% Load Toolboxes
+% the code requires MTEX version 5.11.2: https://mtex-toolbox.github.io/download (also works with 5.10.2)
 
-file1_folder='C:\Users\benja\OneDrive\Documents\GitHub\MTEX_Workshop\Data'; %location where the data is stored
-file1_name='Ti6246 Post_PECS Site 2 Map Data 4'; %should be a h5oina file, do not add in the .h5oina file extension
-
-% file1_folder='/MATLAB Drive/MTEX_Workshop/Data/';
-% file1_name='Mg_Pecs1 Specimen 1 Site 1 Map Data 1'; %should be a h5oina file, do not add in the .h5oina file extension
-
-file_dset='1'; %data set number of interest in the h5 file
-
-mb_length = 20; %micro bar length for plots - if you want to override, you can comment this out/clear this variable and the override will not happen
-
-%% Load MTEX
-
-%location of MTEX 5.10.2
-%if MTEX loaded this doesn't matter
-%if MTEX is not loaded, then this will be used to start MTEX up
-mtex_location='C:\Users\benja\OneDrive\Documents\MATLAB\mtex-5.10.2';
-% mtex_location='/MATLAB Drive/mtex-5.10.2';
+%Toolboxes - folder locations
+mtex_location='C:\Users\ruthb\OneDrive\Documents\MTEX\mtex-5.11.2'; % update this
 
 %start mtex if needed
 try EBSD;
 catch
     run(fullfile(mtex_location,"startup.m"));
 end
+
+%% h5oina file location
+
+% folder 
+file1_folder='C:\Users\ruthb\DocumentsOnLaptop\GitHub\MTEX_Workshop\Data'; %location where the data is stored
+% file
+file1_name='Ti6246 Post_PECS Site 2 Map Data 4'; %should be a h5oina file, do not add in the .h5oina file extension
+
+%% make a results folder if needed
 
 %create a results folder
 file1_name_us=file1_name;
@@ -35,21 +30,33 @@ file1_name_us(strfind(file1_name_us,' '))='_';
 resultsdir=fullfile(cd,'results',file1_name_us);
 if isdir(resultsdir) == 0; mkdir(resultsdir); end
 
-%% Read the h5oina data into Matlab
+%% load the h5oina file
 
-%Make this a full file name
+% Make a full file name
 file1_full=fullfile(file1_folder,[file1_name '.h5oina']);
 
-%read the H5OINA EBSD Data - this will return two structures, with the data
-%contained per layer/slice in the file, and also a contents file if you
-%need to load anything else
-[ebsd_data,header_data,h5oina_contents]=H5OINA_Read(file1_full);
+% load one file 
+% h5oina_file=file1_full; % file name
+warningOn=0; % turn on/off warnings during loading
+[ebsd_original,dataset_header,ebsd_patternmatched,h5_original,h5_patternmatch] = load_h5oina_pm2(file1_name,file1_folder,warningOn);
+ebsd=ebsd_patternmatched; % if not pattern matched it will default to original ebsd data
 
+%% sort the phase names if needed
+
+% updates
 phase_names={'Ti Alpha','Ti Beta'}; %overwrite the phase names
 phase_colors={'R','B'}; %overwrite the colors
 
-%convert into a MTEX container
-[ebsd] = H5OINA_Convert(ebsd_data,header_data,file_dset,phase_names,phase_colors);
+% define the crystal symmetry manually 
+% to see the current values, look at e.g. ebsd(ebsd.phase==1).CS 
+CS1_new = [crystalSymmetry('6/mmm', [3.5, 3.5, 5.5],[90,90,120]*degree, 'X||a*', 'Y||b', 'Z||c*', 'mineral', phase_names{1}, 'color', phase_colors{1})];
+CS2_new = [crystalSymmetry('m-3m', [3.9, 3.9, 3.9],[90,90,90]*degree, 'mineral', phase_names{2}, 'color', phase_colors{2})];
+
+% make a new list of crystal symmetries
+CS_updated={'notIndexed',CS1_new,CS2_new};
+
+%update the crystal symmetry info
+ebsd.CS=CS_updated;
 
 %% Set the plotting preferences - this has to be validated for your instrument
 
@@ -59,6 +66,10 @@ setMTEXpref('zAxisDirection','outofPlane');     %aztec
 
 %font size and overwrite the scale bar if you want
 setMTEXpref('FontSize',12)
+
+%extra (workshop)
+file_dset='1'; %data set number of interest in the h5 file
+mb_length = 50; %micro bar length for plots - if you want to override, you can comment this out/clear this variable and the override will not happen
 
 %% Now do some plots
 

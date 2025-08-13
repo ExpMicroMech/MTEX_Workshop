@@ -2,27 +2,30 @@ clear;
 home;
 close all;
 
-%% The h5 file location
+%% Load Toolboxes
+% The code requires MTEX version 5.11.2: https://mtex-toolbox.github.io/download (also works with 5.10.2)
 
-file1_folder='C:\Users\benja\OneDrive\Documents\GitHub\MTEX_Workshop\Data'; %location where the data is stored
-file1_name='Mg_Pecs1 Specimen 1 Site 1 Map Data 1'; %should be a h5oina file, do not add in the .h5oina file extension
-
-file_dset='1'; %data set number of interest in the h5 file
-
-mb_length = 500; %micro bar length for plots - if you want to override, you can comment this out/clear this variable and the override will not happen
-
-%% Load MTEX
-
-%location of MTEX 5.10.2
-%if MTEX loaded this doesn't matter
-%if MTEX is not loaded, then this will be used to start MTEX up
-mtex_location='C:\Users\benja\OneDrive\Documents\MATLAB\mtex-5.10.2';
+%Toolboxes - folder locations
+mtex_location='C:\Users\ruthb\OneDrive\Documents\MTEX\mtex-5.11.2'; % update this
 
 %start mtex if needed
 try EBSD;
 catch
     run(fullfile(mtex_location,"startup.m"));
 end
+
+%% h5oina file location
+
+% folder 
+file1_folder='C:\Users\ruthb\DocumentsOnLaptop\GitHub\MTEX_Workshop\Data'; %location where the data is stored
+% file
+file1_name='Mg_Pecs1 Specimen 1 Site 1 Map Data 1'; %should be a h5oina file, do not add in the .h5oina file extension
+
+%extra (workshop)
+file_dset='1'; %data set number of interest in the h5 file
+mb_length = 50; %micro bar length for plots - if you want to override, you can comment this out/clear this variable and the override will not happen
+
+%% make a results folder if needed
 
 %create a results folder
 file1_name_us=file1_name;
@@ -31,18 +34,17 @@ file1_name_us(strfind(file1_name_us,' '))='_';
 resultsdir=fullfile(cd,'results',file1_name_us);
 if isdir(resultsdir) == 0; mkdir(resultsdir); end
 
-%% Read the h5oina data into Matlab
+%% load the h5oina file
 
-%Make this a full file name
+% Make a full file name
 file1_full=fullfile(file1_folder,[file1_name '.h5oina']);
 
-%read the H5OINA EBSD Data - this will return two structures, with the data
-%contained per layer/slice in the file, and also a contents file if you
-%need to load anything else
-[ebsd_data,header_data,h5oina_contents]=H5OINA_Read(file1_full);
-
-%convert into a MTEX container
-[ebsd] = H5OINA_Convert(ebsd_data,header_data,file_dset);
+% load one file 
+% h5oina_file=file1_full; % file name
+warningOn=0; % turn on/off warnings during loading
+[ebsd_original,dataset_header,ebsd_patternmatched,h5_original,h5_patternmatch] = load_h5oina_pm2(file1_name,file1_folder,warningOn);
+ebsd=ebsd_patternmatched; % if not pattern matched it will default to original ebsd data
+ebsd=ebsd.gridify; 
 
 %% Set the plotting preferences - this has to be validated for your instrument
 
@@ -81,7 +83,8 @@ if exist('mb_length','var'); mp = MTEX_mb_fix(mb_length); end %change the micron
 
 %% IPF-x, y and z
 % compute the colors
-ipfKey = ipfHSVKey(ebsd(mineral_name));
+% ipfKey = ipfHSVKey(ebsd(mineral_name));
+ipfKey = ipfTSLKey(ebsd(mineral_name)); %use the TSL
 
 %plot the key
 f1=figure;
@@ -136,13 +139,24 @@ odf = calcDensity(ebsd(mineral_name).orientations);
 figure;
 % plot the pole figure representation of the ODF
 plotPDF(odf,[Miller(0,0,1,ebsd(mineral_name).CS) Miller(0,1,0,ebsd(mineral_name).CS)]);
+
 mtexColorbar('location','southoutside')
+mtexColorMap blue2red
+
+%add contours
+levels=[-7:7];
+hold on;
+plotPDF(odf,[Miller(0,0,1,ebsd(mineral_name).CS) Miller(0,1,0,ebsd(mineral_name).CS)],'contour',levels,'linecolor','k');
+mtexColorbar('location','southoutside')
+
 
 %you can also plot this ODF in the IPF
 figure;
-% plot the pole figure representation of the ODF
+% plot the inverse pole figure representation of the ODF
 plotIPDF(odf,[xvector yvector zvector])
 mtexColorbar('location','southoutside')
+mtexColorMap blue2red
+
 
 %% Plot the uncorrelated misorientation distribution
 %see https://mtex-toolbox.github.io/MisorientationDistributionFunction.html
@@ -165,6 +179,8 @@ legend('data MDF','uniform ODF')
 %see https://mtex-toolbox.github.io/GrainReconstruction.html
 
 [grains,ebsd.grainId] = calcGrains(ebsd,'angle',10*degree); 
+% [grains,ebsd.grainId] = calcGrains(ebsd,'angle',10*degree,'boundary','tight');
+
 %care with this threshold value - you can look at the angle distribution for some guidance
 
 %Now plot the grian boundary map on the band contrast map
@@ -237,7 +253,7 @@ xlims=xlim; xlim([0 xlims(2)]);
 
 min_grain_radius=10;
 grains_reduced=grains_indexed_int(grains_indexed_int.equivalentRadius>min_grain_radius);
-
+grains_excluded=grains_indexed_int(grains_indexed_int.equivalentRadius<=min_grain_radius);
 figure;
 plot(ebsd,ebsd.prop.Band_Contrast); colormap('gray');
 hold on;
@@ -247,6 +263,8 @@ if exist('mb_length','var'); mp = MTEX_mb_fix(mb_length); end %change the micron
 
 hold on
 plot(grains_reduced.boundary,'linewidth',0.5,'lineColor','g')
+plot(grains_excluded.boundary,'linewidth',0.5,'lineColor','r')
+
 hold off
 
 %% Demonstrate that we can extract a point from this map
@@ -268,11 +286,12 @@ plot(grains_indexed_int.boundary,'linewidth',0.5,'lineColor','g')
 hold off
 
 %take a mouse input
+disp('Click a grain to select it')
 [x_g,y_g]=ginput(1);
 
 %find the nearest point in the data to this point
 p_map=(ebsd.prop.x-x_g).^2+(ebsd.prop.y-y_g).^2;
-[mv,pattern_number]=min(p_map);
+[mv,pattern_number]=min(reshape(p_map,[],1));
 ebsd_point=ebsd(pattern_number);
 
 hold on;
@@ -300,10 +319,11 @@ plot(ebsd,ebsd.prop.Band_Contrast)
 
 %here we will use a mouse click pair to cut out the box - pick two opposite
 %diagonals
-% [x_i,y_i]=ginput(2);
+disp('Click two diagonal points to select a box to subset the data')
+[x_i,y_i]=ginput(2);
 
-x_i=[-918;-205];
-y_i=[572;1010];
+% x_i=[-918;-205];
+% y_i=[572;1010];
 
 hold on;
 scatter(x_i,y_i);
@@ -399,12 +419,13 @@ title('Crystal Orientation - Z')
 
 
 % take a mouse input
- % [x,y]=ginput(1);
+disp('Select an individual grain as your seed grain orientation');
+ [x,y]=ginput(1);
 
 % % hard code the mouse input to run this - swap the commenting around
 % % if you want a ginput
 % % hard coded position, in um
-x=1379; y=1331;
+% x=1379; y=1331;
 
 %add the point to the figure as a black spot
 hold on;
@@ -459,9 +480,10 @@ nextAxis;
 plot(test_orientations_out, ipfKey.orientation2color(test_orientations_out.orientations));
 title(['Data far from selected grain (>' int2str(orientation_threshold) '^o)'])
 
-%%
+%% plot some unit cells for this
 
-grains_close=grains(test_orientations_in);
+grain_IDs_close=unique(test_orientations_in.grainId);
+grains_close=grains(grain_IDs_close);
 grains_close=grains_close(grains_close.grainSize>3);
 grains_close=grains_close(~grains_close.isBoundary);
 
@@ -470,16 +492,16 @@ plot(test_orientations_in, test_orientations_in.prop.Band_Contrast);
 % title(['Data far from selected grain (>' int2str(orientation_threshold) '^o)'])
 
 hold on
-plot(grains_close.boundary,'linewidth',2,'lineColor','r')
+plot(grains_close.boundary,'linewidth',1,'lineColor','r')
 
 % plot the unit cells
-% %plot the crystal shape for this point
-% scaling = 25; % scale the crystal shape to have a nice size
-% %here we use a hexagon, but you could use a cube for cubic
-% %crystalShape.cube
-% cS = crystalShape.hex(grains_close(mineral_name).CS);
-% grain_centroids=grains_close.centroid;
-% plot(grain_centroids(:,1),grain_centroids(:,2),50, grains_close.meanOrientation * cS * scaling)
+%plot the crystal shape for this point
+scaling = 125; % scale the crystal shape to have a nice size
+%here we use a hexagon, but you could use a cube for cubic
+%crystalShape.cube
+cS = crystalShape.hex(grains_close(mineral_name).CS);
+grain_centroids=grains_close.centroid;
+plot(grain_centroids(:,1),grain_centroids(:,2),50, grains_close.meanOrientation * cS * scaling,'FaceAlpha',0.2); %make the hexagons also transparent so you can see the grains behind
 
 %% copy this m file over, for archival purposes
 
